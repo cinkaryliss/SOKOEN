@@ -2,7 +2,9 @@
 
 #include "ofMain.h"
 #include "ofxOpenNI.h"
-//#include "ofxGui.h"
+#include "ofxOsc.h"
+
+#define PORT 8000
 
 class ofApp : public ofBaseApp{
 public:
@@ -22,16 +24,16 @@ public:
     void dragEvent(ofDragInfo dragInfo);
     void gotMessage(ofMessage msg);
     
-    //ofxPanel gui;
-    //ofxSlider<float> scaleSlider1, scaleSlider2, scaleSlider3;
     ofxOpenNI kinect;
-    ofTrueTypeFont font;
+    ofTrueTypeFont font, figfont;
     ofPoint headpos1, headpos2;
     ofSoundPlayer add, more_add, start, end;
+    ofxOscReceiver receiver;
+    ofxOscMessage m;
     int point1, point2;
     float timer;
     float fontscale1, fontscale2;
-    float cw1, cw2, cwwin, cwlose, ch;
+    float cw1, cw2, cwwin, cwlose, cwdraw, cwt, ch; //文字幅と文字高の補正項
     float scale, offsetX, offsetY;
-    bool hide, battle, result, exc;
+    bool hide, battle, result, replace;
 };
