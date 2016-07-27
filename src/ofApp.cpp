@@ -3,13 +3,14 @@
 //-----------------------------------------------------------------------------------------------------------
 void ofApp::setup(){
     //window設定
+    //壁を0とすると人100,kinect285,プロジェクター355
     ofBackground(0,0,0); //背景色(黒)
     ofSetFrameRate(30); //fps30なら640×480,15なら1024×768
     
     //set ofxOpenNI
     kinect.setup();
     kinect.setRegister(true);
-    kinect.setMirror(true);     //反転
+    //kinect.setMirror(true);     //反転
     kinect.addDepthGenerator(); //深度センサー
     kinect.addImageGenerator(); //カメラ
     kinect.addUserGenerator();  //人認識
@@ -25,7 +26,7 @@ void ofApp::setup(){
     end.load("time_is_up.mp3");
     
     //フォント設定
-    font.load("mplus-1p-bold.ttf", 32); //文字フォント
+    font.load("mplus-1p-bold.ttf", 72); //文字フォント
     figfont.load("mplus-1p-bold.ttf", 100); //数字フォント
     
     //文字の幅を取得
@@ -35,7 +36,8 @@ void ofApp::setup(){
     cwt = figfont.stringWidth("00")/2;
     
     //文字の高さを取得(得点)
-    ch = figfont.stringHeight("0")/2;
+    ch = figfont.stringHeight("A")/2;
+    chfig = figfont.stringHeight("0")/2;
     
     //ゲーム設定
     point1 = point2 = 0;
@@ -44,11 +46,8 @@ void ofApp::setup(){
     
     //指定したポートで接続(OSC)
     receiver.setup(PORT);
-    osccount = 0;
     
     //画面サイズ設定
-    //scale = 1.0;
-    //offsetX = offsetY = 0.0;
     fontscale_x = 1.6;
     fontscale_y = 1.6;
     
@@ -71,175 +70,142 @@ void ofApp::update(){
     
     //文字の幅を取得(得点)
     cw1 = figfont.stringWidth(ofToString(point1))*0.5;
-    if(point1 >= 10)
-        cw1 *= 1.5;
+    /*if(point1 >= 10)
+        cw1 *= 1.0;
     else if(point1 >= 100)
-        cw1 *= 2.0;
-    
-    cw2 = figfont.stringWidth(ofToString(point1))*0.5;
-    if(point2 >= 10)
+        cw1 *= 1.0;
+    */
+    cw2 = figfont.stringWidth(ofToString(point2))*0.5;
+    /*if(point2 >= 10)
         cw2 *= 1.5;
     else if(point2 >= 100)
         cw2 *= 2.0;
-    
+    */
     if(battle && timer >= 0)
-        timer -= 1.0/3.0;
+        timer -= 1.0/10.0;
     
     if(battle && timer <= 0){
         end.play();
         battle = false;
     }
     
-    osccount++;
-    
     //OSCメッセージを受信
-    while(receiver.hasWaitingMessages() && osccount % 15 == 1){
-        receiver.getNextMessage(&m);
-        
-        if(m.getAddress() == "/button/player1moreplus"){
-            point1 += 20;
-            more_add.play();
-            m.clear();
-        }
-        else if(m.getAddress() == "/button/player2moreplus"){
-            point2 += 20;
-            more_add.play();
-            m.clear();
-        }
-        else if(m.getAddress() == "/button/player1plus"){
-            point1 += 10;
-            add.play();
-            m.clear();
-        }
-        else if(m.getAddress() == "/button/player2plus"){
-            point2 += 10;
-            add.play();
-            m.clear();
-        }
-        else if(m.getAddress() == "/button/player1minus"){
-            point1 -= 10;
-            m.clear();
-        }
-        else if(m.getAddress() == "/button/player2minus"){
-            point2 -= 10;
-            m.clear();
-        }
-        else if(m.getAddress() == "/button/replace"){
-            int tem;
-            tem = point1;
-            point1 = point2;
-            point2 = tem;
-            replace = !replace;
-            m.clear();
-        }
-        else if(m.getAddress() == "/button/start"){
-            battle = true;
-            start.play();
-            m.clear();
-        }
-        else if(m.getAddress() == "/button/result"){
-            result = true;
-            m.clear();
-        }
-        else if(m.getAddress() == "/button/reset"){
-            point1 = point2 = 0;
-            timer = 60.0;
-            battle = result = replace = false;
-            m.clear();
-        }
-        else if(m.getAddress() == "/button/fullscreen"){
-            ofToggleFullscreen();
-            m.clear();
-        }
-        osccount = 0;
+    receiver.getNextMessage(&m);
+    
+    if(m.getAddress() == "/button/player1moreplus"){
+        point1 += 20;
+        more_add.play();
+        m.clear();
+    }
+    else if(m.getAddress() == "/button/player2moreplus"){
+        point2 += 20;
+        more_add.play();
+        m.clear();
+    }
+    else if(m.getAddress() == "/button/player1plus"){
+        point1 += 10;
+        add.play();
+        m.clear();
+    }
+    else if(m.getAddress() == "/button/player2plus"){
+        point2 += 10;
+        add.play();
+        m.clear();
+    }
+    else if(m.getAddress() == "/button/player1minus"){
+        point1 -= 10;
+        m.clear();
+    }
+    else if(m.getAddress() == "/button/player2minus"){
+        point2 -= 10;
+        m.clear();
+    }
+    else if(m.getAddress() == "/button/replace"){
+        int tem;
+        tem = point1;
+        point1 = point2;
+        point2 = tem;
+        replace = !replace;
+        m.clear();
+    }
+    else if(m.getAddress() == "/button/start"){
+        battle = true;
+        start.play();
+        m.clear();
+    }
+    else if(m.getAddress() == "/button/result"){
+        result = true;
+        m.clear();
+    }
+    else if(m.getAddress() == "/button/reset"){
+        point1 = point2 = 0;
+        timer = 60.0;
+        battle = result = replace = false;
+        m.clear();
+    }
+    else if(m.getAddress() == "/button/fullscreen"){
+        ofToggleFullscreen();
+        m.clear();
     }
 }
-
 //-----------------------------------------------------------------------------------------------------------
 void ofApp::draw(){
-    //ofScale(scale, scale);
-    //fontscale1 = ofMap(headpos1.z, 500, 4500, 2, 0.5);
-    //fontscale2 = ofMap(headpos2.z, 500, 4500, 2, 0.5);
-    
     if(result){
+        //ofSetColor(255,255,255);
+        //kinect.drawImage(offsetX, 0, ofGetWidth(), ofGetHeight());
         //プレイヤー1が勝利の場合
         if((!replace && point1 > point2) || (replace && point1 < point2)){
             /*結果発表の音*/
             //勝者表示
-            //ofPushMatrix();
-            //ofScale(fontscale1, fontscale1);
             ofSetColor(255,0,0);
-            font.drawString("WIN!!", (headpos1.x-cwwin)*fontscale_x, (headpos1.y-ch)*fontscale_y);
-            //ofPopMatrix();
-            
+            font.drawString("WIN!!", (headpos1.x-cwwin/2)*fontscale_x, (headpos1.y/*-ch*/)*fontscale_y);
             //敗者表示
-            //ofPushMatrix();
-            //ofScale(fontscale2, fontscale2);
             ofSetColor(0,0,255);
-            font.drawString("LOSE", (headpos2.x-cwlose)*fontscale_x, (headpos2.y-ch)*fontscale_y);
-            //ofPopMatrix();
+            font.drawString("LOSE", (headpos2.x-cwlose/2)*fontscale_x, (headpos2.y/*-ch*/)*fontscale_y);
         }
         
         //プレイヤー2が勝利の場合
         else if((!replace && point1 < point2) || (replace && point1 > point2)){
             /*結果発表の音*/
             //勝者表示
-            //ofPushMatrix();
-            //ofScale(fontscale2, fontscale2);
             ofSetColor(255,0,0);
-            font.drawString("WIN!!", (headpos2.x-cwwin)*fontscale_x, (headpos2.y-ch)*fontscale_y);
-            //ofPopMatrix();
-            
+            font.drawString("WIN!!", (headpos2.x-cwwin/2)*fontscale_x, (headpos2.y/*-ch*/)*fontscale_y);
             //敗者表示
-            //ofPushMatrix();
-            //ofScale(fontscale1, fontscale1);
             ofSetColor(0,0,255);
-            font.drawString("LOSE", (headpos1.x-cwlose)*fontscale_x, (headpos1.y-ch)*fontscale_y);
-            //ofPopMatrix();
+            font.drawString("LOSE", (headpos1.x-cwlose/2)*fontscale_x, (headpos1.y/*-ch*/)*fontscale_y);
         }
         
         //引き分けの場合
         else{
             /*引き分けの音*/
             ofSetColor(255,255,255);
-            font.drawString("DRAW!", ofGetWidth()/2-cwdraw*2, 100);
+            font.drawString("DRAW!", ofGetWidth()/2-cwdraw, 150);
         }
     }
     else{
         //カラー画像を描画
-        ofSetColor(255,255,255);
-        kinect.drawImage(offsetX, 0, ofGetWidth(), ofGetHeight());
+        //ofSetColor(255,255,255);
+        //kinect.drawImage(offsetX, 0, ofGetWidth(), ofGetHeight());
         
         //スケルトンを描画
-        /*
-        ofSetColor(255,255,255);
-        kinect.drawSkeletons(offsetX, 0, ofGetWidth(), ofGetHeight());
-        */
+        //ofSetColor(255,255,255);
+        //kinect.drawSkeletons(offsetX, 0, ofGetWidth(), ofGetHeight());
         
         //1人だけが認識されているとき
         if(kinect.getNumTrackedUsers() == 1){
             //1人目の得点表示
-            //ofPushMatrix();
             ofSetColor(255,255,255); //文字色
-            //ofScale(fontscale1, fontscale1);
-            figfont.drawString(ofToString(point1), (headpos1.x-cw1)*fontscale_x, (headpos1.y-ch)*fontscale_y);
-            //ofPopMatrix();
+            figfont.drawString(ofToString(point1), (headpos1.x-cw1)*fontscale_x, (headpos1.y)*fontscale_y);
         }
         //2人共認識されているとき
         else if(kinect.getNumTrackedUsers() == 2){
             //1人目の得点表示
-            //ofPushMatrix();
             ofSetColor(255,255,255); //文字色
-            //ofScale(fontscale1, fontscale1);
-            figfont.drawString(ofToString(point1), (headpos1.x-cw1)*fontscale_x, (headpos1.y-ch)*fontscale_y);
-            //ofPopMatrix();
+            figfont.drawString(ofToString(point1), (headpos1.x-cw1)*fontscale_x, (headpos1.y)*fontscale_y);
             
             //2人目の得点表示
-            //ofPushMatrix();
             ofSetColor(255,255,255); //文字色
-            //ofScale(fontscale2, fontscale2);
-            figfont.drawString(ofToString(point2), (headpos2.x-cw2)*fontscale_x, (headpos2.y-ch)*fontscale_y);
-            //ofPopMatrix();
+            figfont.drawString(ofToString(point2), (headpos2.x-cw2)*fontscale_x, (headpos2.y)*fontscale_y);
         }
         
         //残り時間が1桁になるまでは白、1桁で黄、0で赤
@@ -261,7 +227,7 @@ void ofApp::draw(){
 //-----------------------------------------------------------------------------------------------------------
 void ofApp::keyPressed(int key){
     switch(key){
-        case('s'):
+        case('g'):
             battle = true;
             start.play();
             break;
@@ -269,10 +235,31 @@ void ofApp::keyPressed(int key){
             point1 = point2 = 0;
             timer = 60.0;
             battle  = result = replace = false;
-            //リセットの時に音を入れたい
             break;
         case('f'):
             ofToggleFullscreen();
+            break;
+        case('q'):
+            point1 += 20;
+            more_add.play();
+            break;
+        case('a'):
+            point1 += 10;
+            add.play();
+            break;
+        case('z'):
+            point1 -= 10;
+            break;
+        case('w'):
+            point2 += 20;
+            more_add.play();
+            break;
+        case('s'):
+            point2 += 10;
+            add.play();
+            break;
+        case('x'):
+            point2 -= 10;
             break;
         case(' '):
             int tem;
@@ -324,9 +311,7 @@ void ofApp::mouseExited(int x, int y){
 
 //-----------------------------------------------------------------------------------------------------------
 void ofApp::windowResized(int w, int h){
-    //scale = MIN(DEFAULT_X/ofGetWidth(), DEFAULT_Y/ofGetHeight());
-    //offsetX = (ofGetWidth()-DEFAULT_X*scale)/2;
-    //offsetY = (ofGetHeight()-480*scale)/2;
+    
 }
 
 //-----------------------------------------------------------------------------------------------------------

@@ -31,11 +31,10 @@ public:
     ofxOscReceiver receiver;
     ofxOscMessage m;
     int point1, point2;
-    int osccount;
     float timer;
     //float fontscale1, fontscale2;
     float fontscale_x, fontscale_y;
-    float cw1, cw2, cwwin, cwlose, cwdraw, cwt, ch; //文字幅と文字高の補正項
+    float cw1, cw2, cwwin, cwlose, cwdraw, cwt, ch, chfig; //文字幅と文字高の補正項
     float scale, offsetX, offsetY;
     bool battle, result, replace;
 };
